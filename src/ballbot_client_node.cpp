@@ -61,7 +61,7 @@ int main(int argc, char **argv)
 
   }
   // 3. ピン認識起動
-  else if(check_future_complete(node, linear_future))
+  if(check_future_complete(node, linear_future))
   {
   // サーバーが起動するまで待つ
   if (!tracker_client->wait_for_service(std::chrono::seconds(5)))
