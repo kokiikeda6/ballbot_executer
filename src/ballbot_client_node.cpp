@@ -1,6 +1,6 @@
-#include "rclcpp/rclcpp.hpp"
-#include "linear_motor_msgs/srv/act.hpp"
-#include "linear_motor_msgs/srv/mode.hpp"
+#include <rclcpp/rclcpp.hpp>
+#include <linear_motor_msgs/srv/act.hpp>
+#include <linear_motor_msgs/srv/mode.hpp>
 
 bool check_future_complete(auto& node, auto& future)
 {
