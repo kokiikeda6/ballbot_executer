@@ -25,7 +25,7 @@ int main(int argc, char **argv)
   auto node = rclcpp::Node::make_shared("ballbot_client_node");
 
   auto linear_client = node->create_client<linear_motor_msgs::srv::Act>("/action_command");
-  auto tracker_client = node->create_client<linear_motor_msgs::srv::Act>("/tracker_mode");
+  auto tracker_client = node->create_client<linear_motor_msgs::srv::Mode>("/tracker_mode");
   auto linear_request = std::make_shared<linear_motor_msgs::srv::Act::Request>();
   auto tracker_request = std::make_shared<linear_motor_msgs::srv::Mode::Request>();
 
@@ -41,38 +41,40 @@ int main(int argc, char **argv)
 
   RCLCPP_INFO(node->get_logger(), "オムニホイールを格納します");
   linear_request->action = "up";
-  auto linear_future = linear_client->async_send_request(linear_request);
+  auto linear_up_future = linear_client->async_send_request(linear_request);
 
   // 2. 10秒待機 → オムニホイール展開
-  if(check_future_complete(node, linear_future))
+  if(check_future_complete(node, linear_up_future))
   {
-  sleep(10);
+    RCLCPP_INFO(node->get_logger(), "10秒待機中...");
+    sleep(10);
 
-  // サーバーが起動するまで待つ
-  if (!linear_client->wait_for_service(std::chrono::seconds(5)))
-  {
-    RCLCPP_ERROR(node->get_logger(), "リニアアクチュエータのサービスが見つかりません");
-    return 1;
-  }
+    // サーバーが起動するまで待つ
+    if (!linear_client->wait_for_service(std::chrono::seconds(5)))
+    {
+      RCLCPP_ERROR(node->get_logger(), "リニアアクチュエータのサービスが見つかりません");
+      return 1;
+    }
 
-  RCLCPP_INFO(node->get_logger(), "オムニホイールを展開します");
-  linear_request->action = "down";
-  auto linear_future = linear_client->async_send_request(linear_request);
+    RCLCPP_INFO(node->get_logger(), "オムニホイールを展開します");
+    linear_request->action = "down";
+    auto linear_down_future = linear_client->async_send_request(linear_request);
 
-  }
   // 3. ピン認識起動
-  if(check_future_complete(node, linear_future))
-  {
-  // サーバーが起動するまで待つ
-  if (!tracker_client->wait_for_service(std::chrono::seconds(5)))
-  {
-    RCLCPP_ERROR(node->get_logger(), "ピン認識のサービスが見つかりません");
-    return 1;
-  }
+    if(check_future_complete(node, linear_down_future))
+    {
+      // サーバーが起動するまで待つ
+      if (!tracker_client->wait_for_service(std::chrono::seconds(5)))
+      {
+        RCLCPP_ERROR(node->get_logger(), "ピン認識のサービスが見つかりません");
+        return 1;
+      }
 
-  RCLCPP_INFO(node->get_logger(), "ピンの認識を開始します");
-  tracker_request->mode = "tracker_START";
-  auto tracker_future = tracker_client->async_send_request(linear_request);
+      RCLCPP_INFO(node->get_logger(), "ピンの認識を開始します");
+      tracker_request->mode = "tracker_START";
+      auto tracker_future = tracker_client->async_send_request(tracker_request);
+    }
+
   }
 
   rclcpp::shutdown();
