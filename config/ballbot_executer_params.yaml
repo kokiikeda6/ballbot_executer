@@ -1,0 +1,3 @@
+ballbot_client_node:
+  ros__parameters:
+    waiting_time: 10 # [s]

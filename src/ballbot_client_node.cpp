@@ -24,6 +24,10 @@ int main(int argc, char **argv)
   rclcpp::init(argc, argv);
   auto node = rclcpp::Node::make_shared("ballbot_client_node");
 
+  node->declare_parameter<int>("waiting_time", 10);
+  int waiting_time;
+  node->get_parameter("waiting_time", waiting_time);
+
   auto linear_client = node->create_client<linear_motor_msgs::srv::Act>("/action_command");
   auto tracker_client = node->create_client<linear_motor_msgs::srv::Mode>("/tracker_mode");
   auto linear_request = std::make_shared<linear_motor_msgs::srv::Act::Request>();

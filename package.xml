@@ -9,7 +9,11 @@
 
   <buildtool_depend>ament_cmake</buildtool_depend>
 
+  <depend>omni_control</depend>
+  <depend>linear_motor_controller</depend>
   <depend>linear_motor_msgs</depend>
+  <depend>pin_recognition</depend>
+
 
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>
